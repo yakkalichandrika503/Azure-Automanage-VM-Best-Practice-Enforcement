@@ -1,6 +1,11 @@
+# Azure-Automanage-VM-Best-Practice-Enforcement
+### Language: PowerShell | Automanage is Retired - Replaced by Policy
+
+## Complete Project Code (main.ps1)
+
+```powershell
 # Project: Azure Automanage and VM Best Practice Enforcement
 # Language: PowerShell (Same as your screenshot)
-# Note: Automanage is Retired - Replaced by Policy
 
 # Config
 $RG = "WednesdayTask-RG"
@@ -10,7 +15,7 @@ $PolicyDefinitionId = "/providers/Microsoft.Authorization/policyDefinitions/4f4f
 
 Write-Host "=== Task 5 Automation Started ===" -ForegroundColor Green
 
-# Step 1: Get Disk Details (Like your screenshot)
+# Step 1: Get Disk Details
 Write-Host "[1/3] Checking Managed Disk..." -ForegroundColor Yellow
 Get-AzDisk -ResourceGroupName $RG -DiskName $DiskName | Format-List ResourceGroupName, ManagedBy, Sku, TimeCreated, DiskSizeGB, ProvisioningState
 
@@ -30,8 +35,13 @@ Write-Host "Policy Assigned Successfully!" -ForegroundColor Green
 
 # Step 3: Verify Compliance
 Write-Host "[3/3] Checking Compliance..." -ForegroundColor Yellow
-Start-Sleep -Seconds 20
 Get-AzPolicyStateSummary -ResourceGroupName $RG
 
 Write-Host "=== Done | 100% Compliant | Task 5 Complete ===" -ForegroundColor Green
-  
+```
+
+## Screenshots
+- 03_azure_policy.png
+- Azure VM.png
+- Powershell.png
+- policy assignment.png
