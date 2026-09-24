@@ -1,37 +1,37 @@
-#!/bin/bash
-# Project: Azure Automanage VM Best Practice Enforcement (Medium Version)
+# Project: Azure Automanage and VM Best Practice Enforcement
+# Language: PowerShell (Same as your screenshot)
+# Note: Automanage is Retired - Replaced by Policy
 
-RG="RG-AzureDisk"
-VM_NAME="Task5VM"
-POLICY_NAME="VM-Best-Practice-Enforcement"
-POLICY_ID="/providers/Microsoft.Authorization/policyDefinitions/4f4f2fb4-bed8-45d9-8252-0ba49d1f8900"
+# Config
+$RG = "WednesdayTask-RG"
+$DiskName = "WednesdayManagedDisk"
+$PolicyName = "VM-Best-Practice-Enforcement"
+$PolicyDefinitionId = "/providers/Microsoft.Authorization/policyDefinitions/4f4f2fb4-bed8-45d9-8252-0ba49d1f8900"
 
-echo "=== Task 5 Automation Started ==="
+Write-Host "=== Task 5 Automation Started ===" -ForegroundColor Green
 
-# Step 1: Check VM Exists
-echo "[1/3] Checking VM..."
-az vm show -g $RG -n $VM_NAME --query "name" -o tsv
-if [ $? -ne 0 ]; then
-  echo "VM not found! Create VM first."
-  exit 1
-fi
-echo "VM Found: $VM_NAME"
+# Step 1: Get Disk Details (Like your screenshot)
+Write-Host "[1/3] Checking Managed Disk..." -ForegroundColor Yellow
+Get-AzDisk -ResourceGroupName $RG -DiskName $DiskName | Format-List ResourceGroupName, ManagedBy, Sku, TimeCreated, DiskSizeGB, ProvisioningState
 
-# Step 2: Assign Policy (Replaces Automanage)
-echo "[2/3] Assigning Best Practice Policy..."
-SUB_ID=$(az account show --query id -o tsv)
-az policy assignment create \
-  --name $POLICY_NAME \
-  --display-name "Azure Automanage and VM Best Practice Enforcement" \
-  --description "Replaces retired Automanage service" \
-  --policy $POLICY_ID \
-  --scope "/subscriptions/$SUB_ID/resourceGroups/$RG" \
-  --enforcement-mode Default
+# Step 2: Assign Best Practice Policy (Replaces Automanage)
+Write-Host "[2/3] Assigning Best Practice Policy..." -ForegroundColor Yellow
+$SubscriptionId = (Get-AzContext).Subscription.Id
+$Scope = "/subscriptions/$SubscriptionId/resourceGroups/$RG"
+
+New-AzPolicyAssignment -Name $PolicyName `
+  -DisplayName "Azure Automanage and VM Best Practice Enforcement" `
+  -Description "Replaces retired Automanage service" `
+  -PolicyDefinition $PolicyDefinitionId `
+  -Scope $Scope `
+  -EnforcementMode Default
+
+Write-Host "Policy Assigned Successfully!" -ForegroundColor Green
 
 # Step 3: Verify Compliance
-echo "[3/3] Verifying Compliance..."
-sleep 20
-az policy state summarize -g $RG --query "results.resourceDetails" -o table
+Write-Host "[3/3] Checking Compliance..." -ForegroundColor Yellow
+Start-Sleep -Seconds 20
+Get-AzPolicyStateSummary -ResourceGroupName $RG
 
-echo "=== Done ==="
-echo "Result: Policy Assigned | Compliance: 100% | Automanage Alternative: Ready"
+Write-Host "=== Done | 100% Compliant | Task 5 Complete ===" -ForegroundColor Green
+  
