@@ -5,7 +5,7 @@
 
 ```powershell
 # Project: Azure Automanage and VM Best Practice Enforcement
-# Language: PowerShell (Same as your screenshot)
+# Language: PowerShell 
 
 # Config
 $RG = "WednesdayTask-RG"
